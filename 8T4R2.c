@@ -44,8 +44,8 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
-#include "motordrive.h"
-#include "HC_SR04_AT84.h"
+#include "motordrive.h"    	// pwm library functions
+#include "HC_SR04_AT84.h"	// sonar library functions
 
 
 
