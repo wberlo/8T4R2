@@ -5,20 +5,18 @@
  *  Author: Wim
  *
  * tiny robot with 2 wheel drive
- * temperature sensor sets driving mood
  * sonar detects objects
  * L wheel on PB0, PB2
  * R wheel on PB1, PA7
  * PB0, PB1 are direction pins
  * PB2, PA7 are speed pins (pwm)
- * TMP36 on PA1
  * Sonar on PA3 (trigPin) and PA0 (echoPin)
  * Timer0 is used for speed (pwm)
  * Timer1 is used for timing sonar pulse
  * pin usage:
  * PORTA:
  * PA0: input: SONARread echopin (Timer1)
- * PA1: input: ADClib TMP36 signal
+ * PA1: available
  * PA2: LED
  * PA3: output: SONARread trigpin
  * PA4: available
@@ -47,18 +45,17 @@
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include "motordrive.h"
-//#include "adclib.h"
 #include "HC_SR04_AT84.h"
 
 
 
 /************************************************************************/
-/*  function: blink_A2													*/
-/*	input: uint8_t freq													*/
-/*	output: void														*/
-/*	blinks an LED on port A2 a number of times							*/
-/*	turns LED on for 0.1 s and off for 0.1 s							*/
-/*	repeats freq times													*/
+/*  function: blink_A2							*/
+/*	input: uint8_t freq						*/
+/*	output: void							*/
+/*	blinks an LED on port A2 a number of times			*/
+/*	turns LED on for 0.1 s and off for 0.1 s			*/
+/*	repeats freq times						*/
 /************************************************************************/
 void blink_A2(uint8_t freq)
 {
@@ -72,6 +69,13 @@ void blink_A2(uint8_t freq)
 		_delay_ms(100);
 	} while (ii--);
 }	// end blink_A2
+
+/************************************************************************/
+/*  function: sign_R_A2							*/
+/*	input: uint8_t freq						*/
+/*	output: void							*/
+/*	signs morse code 'R'						*/
+/************************************************************************/
 
 void sign_R_A2(void)
 {
@@ -89,6 +93,13 @@ void sign_R_A2(void)
 		PORTA &= ~(1<<PA2);
 		_delay_ms(600);
 }	// end blink_A2
+
+/************************************************************************/
+/*  function: sign_SOS_A2						*/
+/*	input: uint8_t freq						*/
+/*	output: void							*/
+/*	signs morse code 'SOS'						*/
+/************************************************************************/
 
 void sign_SOS_A2(void)
 {
@@ -129,7 +140,15 @@ void sign_SOS_A2(void)
 	_delay_ms(200);
 	PORTA &= ~(1<<PA2);
 	_delay_ms(600);
-}	// end blink_A2
+}	// end SOS_A2
+
+/************************************************************************/
+/*  function: turn2open							*/
+/*	input: int speed						*/
+/*	output: long maxdistance					*/
+/*	turns robot and tries to figure out which direction	 	*/
+/*      is most open, faces robot in that direction			*/
+/************************************************************************/
 
 long turn2open(int speed)
 {
@@ -165,6 +184,11 @@ long turn2open(int speed)
 	return maxdistance;
 }
 
+/****************************************************************/
+/* putting it all together ...					*/
+/* initializing, measuring distance using SONAR,		*/
+/* operating motors and trying to avoid obstacles ...		*/
+/****************************************************************/
 int main()
 {
 	long distance;
